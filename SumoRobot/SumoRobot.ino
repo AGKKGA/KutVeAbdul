@@ -1,5 +1,3 @@
-
-=======
 // PinOut
 #define HC_TRIG 9
 #define HC_ECHO 10
@@ -22,12 +20,6 @@ float getDist() {
   uint32_t us = pulseIn(HC_ECHO, HIGH);
   // Calculating distance (in cm) and returning
   return (us / 58.3);
-}
-// Exponential filtering function for distance
-float distFiltered(){
-  float dist = getDist();       // getting distance   
-  distFilt += (dist - distFilt) * 0.2;  // filtering
-  return (distFilt); // returning
 }
 // Main loop ////////////////////////////////////////////////////////////
 void loop() {  
