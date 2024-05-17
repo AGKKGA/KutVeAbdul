@@ -1,3 +1,10 @@
+/* Some important info:
+Wheels diameter without band: 64mm
+Wheels diameter with band: 67mm
+*/
+
+
+
 // PinOut
 
 // QTR
