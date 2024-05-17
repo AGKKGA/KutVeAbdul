@@ -46,7 +46,6 @@ void goForward() {
   digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2L, LOW);
   analogWrite(EnL, 255);  // move at full speed
-  delay(100);             // delay for 100 miliseconds
 }
 
 void turnRight() {
@@ -56,7 +55,6 @@ void turnRight() {
   digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2L, LOW);
   analogWrite(EnL, 255);  // move at full speed
-  delay(10);              // delay for 10 miliseconds
 }
 
 // left
@@ -67,7 +65,6 @@ void turnLeft() {
   digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move counterclockwise
   digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // move at full speed
-  delay(10);              // delay for 10 miliseconds
 }
 
 // backwards
@@ -80,7 +77,6 @@ void goBackward() {
   counterclockwise
     digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // move at full speed
-  delay(100);             // delay for 100 miliseconds
 }
 
 //rotate
@@ -91,7 +87,6 @@ void rotate() {
   digitalWrite(In1L, HIGH);  // It is high and the other one is high so the motor will stop
   digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
-  delay(100);  // delay for 100 miliseconds
 }
 
 // stop
@@ -102,7 +97,6 @@ void stop() {
   digitalWrite(In1L, HIGH);  // It is high and the other one is high so the motor will stop
   digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
-  delay(100);  // delay for 100 miliseconds
 }
 // Main loop ////////////////////////////////////////////////////////////
 void loop() {  
