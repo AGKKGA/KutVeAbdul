@@ -29,8 +29,28 @@ int USS_dist[] = {0,0,0}; // Distance value for each sensor {left, front, right}
 // Setup
 void setup() {
   Serial.begin(9600);
-  pinMode(HC_TRIG, OUTPUT); // trig output
-  pinMode(HC_ECHO, INPUT);  // echo input
+  //Ultrasonic sensor
+  for(int i=0; i<=2; i++){
+    pinMode(USS_trig[i], OUTPUT); // trig output
+  }
+  for (int i=0; i<=2; i++){
+    pinMode(USS_echo[i], INPUT);  // echo input
+  }
+  // QTR
+  pinMode(QTR_F, INPUT);  // set the FRONT egde senosr as an INPUT
+  pinMode(QTR_B, INPUT);  // set the BACK egde senosr as an INPUT
+  //Right motor
+  pinMode(In1R, OUTPUT);  // set the INPUT1 pin of the right DC motor as an OUTPUT
+  pinMode(In2R, OUTPUT);  // set the INPUT2 pin of the right DC motor as an OUTPUT
+  pinMode(EnR, OUTPUT);   // set the Enable pin of the right DC motor as an OUTPUT
+
+  pinMode(In1L, OUTPUT);  // set the INPUT1 pin of the left DC motor as an OUTPUT
+  pinMode(In2L, OUTPUT);  // set the INPUT2 pin of the left DC motor as an OUTPUT
+  pinMode(EnL, OUTPUT);   // set the Enable pin of the left DC motor as an OUTPUT
+
+  // Instead of stopping the whole thing, just stop the motor :)
+  analogWrite(EnR, 0);  // Stop the right DC motor by making the speed 0
+  analogWrite(EnL, 0);  // Stop the left DC motor by making the speed 0
 }
 // Function for measuring distance in cm by UltraSonic Sensor 
 float getDist(int trig, int echo) {
