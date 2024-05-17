@@ -1,7 +1,7 @@
 // QTR
 
-int QTR_F = 5;  //The FRONT QTR-1A sensor, we will use it as a digital pin
-int QTR_B = 6;  // The BACK QTR-1A sensor, we will use it as a digital pin
+#define QTR_F = 5;  //The FRONT QTR-1A sensor, we will use it as a digital pin
+#define QTR_B = 6;  // The BACK QTR-1A sensor, we will use it as a digital pin
 
 //Ultrasonic
 

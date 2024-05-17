@@ -7,8 +7,8 @@ int QTR_B = 6;  // The BACK QTR-1A sensor, we will use it as a digital pin
 
 //Ultrasonic
 // Vcc->5V 
-int TRIGGER_ULTRASONIC = 4;  // Trigger pin for the front sensor
-int ECHO_ULTRASONIC = 3;     // Echo pin for the front sensor
+int HC_TRIG = 4;  // Trigger pin for the front sensor
+int HC_ECHO = 3;     // Echo pin for the front sensor
 
 // Motor (Right)
 int In1R = 10;  // Input 1 for the right DC motor to control the direction of the motor
@@ -70,11 +70,11 @@ void turnLeft() {
 // backwards
 void goBackward() {
   digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move
-  counterclockwise
+  // counterclockwise
     digitalWrite(In2R, HIGH);
   analogWrite(EnR, 255);    // move at full speed
   digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move
-  counterclockwise
+  // counterclockwise
     digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // move at full speed
 }
