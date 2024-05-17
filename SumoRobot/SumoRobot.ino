@@ -98,6 +98,15 @@ void stop() {
   digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
 }
+bool floor(uint32_t sensor){ //Function for QTR sensor
+  if (sensor=="front"){
+    // has to be a function that uses FRONT qtr sensor
+    
+  }
+  else if(sensor=="back"){
+    // has to be a function that uses BACK qtr sensor
+  }
+}
 // Main loop ////////////////////////////////////////////////////////////
 void loop() {  
   
