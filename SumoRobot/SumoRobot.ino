@@ -1,14 +1,14 @@
 // PinOut
 
 // QTR
-
+// VIN -> 5V
 int QTR_F = 5;  //The FRONT QTR-1A sensor, we will use it as a digital pin
 int QTR_B = 6;  // The BACK QTR-1A sensor, we will use it as a digital pin
 
 //Ultrasonic
 // Vcc->5V 
-int HC_TRIG = 4;  // Trigger pin for the front sensor
-int HC_ECHO = 3;     // Echo pin for the front sensor
+int USS_trig[] = {13,15,16}; // Trigger for each sensor {left, front, right} NEED TO CHANGE PINS
+int USS_echo[] = {17,18,19}; // Echo pins for each sensor {left front, right} NEED TO CHANGE PINS
 
 // Motor (Right)
 int In1R = 10;  // Input 1 for the right DC motor to control the direction of the motor
@@ -21,9 +21,9 @@ int In2L = 8;  // Input 2 for the left DC motor to control the direction of the 
 int EnL = 9;   // Enable pin for the left DC motor to control the speed of the motor
 
 // Pins for 3 ultrasonic sensors 
-int USS_trig[] = {13,15,16}; // Trigger for each sensor {left, front, right} NEED TO CHANGE PINS
-int USS_echo[] = {17,18,19}; // Echo pins for each sensor {left front, right} NEED TO CHANGE PINS
-// distance of each sensor showing
+
+
+// VARIABLES
 int USS_dist[] = {0,0,0}; // Distance value for each sensor {left, front, right}
 
 // Setup
