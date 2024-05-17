@@ -65,8 +65,8 @@ void loop() {
   // Now me check if robot is in the ring or out of the ring
   //1 means black, 0 means white
   if (digitalRead(QTR_F) == 1 && digitalRead(QTR_B) == 1) {
-    if (distance > 2 && distance < 75) { goForward(); }
-    if (distance > 75) { rotate(); }
+    if (distance < 75) { goForward(); }
+    else{ rotate(); }
   }
 
   else if (digitalRead(QTR_F) == 1 && digitalRead(QTR_B) == 0) {
