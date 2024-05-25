@@ -15,8 +15,7 @@ Formula for movement:
 
 // QTR
 // VIN -> 5V
-int QTR_F = 5;  //The FRONT QTR-1A sensor, we will use it as a digital pin
-int QTR_B = 6;  // The BACK QTR-1A sensor, we will use it as a digital pin
+int QTR_output = 5;
 
 //Ultrasonic
 // Vcc->5V 
@@ -34,7 +33,8 @@ int In2L = 8;  // Input 2 for the left DC motor to control the direction of the 
 int EnL = 9;   // Enable pin for the left DC motor to control the speed of the motor
 
 // VARIABLES
-
+unsigned long color_val, QTR_time_1, QTR_time_2; //needed for QTR sensor's function working
+unsigned long WHITE=3000; //brightness of white line. (needed to adjust bc values depends on environment)
 
 // Setup
 void setup() {
@@ -42,9 +42,6 @@ void setup() {
   //Ultrasonic sensor
   pinMode(USS_trig, OUTPUT);
   pinMode(USS_echo, INPUT);
-  // QTR
-  pinMode(QTR_F, INPUT);  // set the FRONT egde senosr as an INPUT
-  pinMode(QTR_B, INPUT);  // set the BACK egde senosr as an INPUT
   //Right motor
   pinMode(In1R, OUTPUT);  // set the INPUT1 pin of the right DC motor as an OUTPUT
   pinMode(In2R, OUTPUT);  // set the INPUT2 pin of the right DC motor as an OUTPUT
@@ -57,6 +54,8 @@ void setup() {
   // Instead of stopping the whole thing, just stop the motor :)
   analogWrite(EnR, 0);  // Stop the right DC motor by making the speed 0
   analogWrite(EnL, 0);  // Stop the left DC motor by making the speed 0
+
+  // QTR pinMode is adjusted in function
 }
 // Function for measuring distance in cm by UltraSonic Sensor 
 float getDist() {
@@ -129,13 +128,27 @@ void stop() {
   digitalWrite(In2L, HIGH);
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
 }
-bool floor(uint32_t cmd){ //Function for QTR sensor
-  if (cmd=="front"){
-    // has to be a function that uses FRONT qtr sensor
-    
+bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "true", when sees black)
+  // Emitting the IR signal for 1ms
+  pinMode(QTR_output, OUTPUT);
+  digitalWrite(QTR_output,HIGH);
+  delay(1);
+  // changing pinmode of sensor (it's really genius how this sensor works ha)
+  pinMode(QTR_output, INPUT);
+  // measuring time when signal emitted
+  QTR_time_1=micros();
+  // Recieving the IR signal
+  while (digitalRead(QTR_output)==HIGH){ //if there is no signal yet wait for 5 Microseconds and checking again if there is signal
+    delayMicroseconds(5);
   }
-  else if(cmd=="back"){
-    // has to be a function that uses BACK qtr sensor
+  QTR_time_2=micros();  // loop ends when signal recieved, measuring time when signal recieved
+  color_val=QTR_time_2-QTR_time_1; // calculating the time spent on measurement, and getting the result of time it took to reflect from the material. IDK how it works, but it works XDXD
+  // Serial.println(color_val); // printing to serial monitor (optional)
+  if (color_val>WHITE){ // return true, if material is dark
+    return (true);
+  }
+  else{
+    return (false); // return false, if material is bright
   }
 }
 // Main loop ////////////////////////////////////////////////////////////
