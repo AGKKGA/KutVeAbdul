@@ -129,20 +129,19 @@ void stop() {
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
 }
 bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "true", when sees black)
+  // I've tried to understand how this code works, but couldnt, but it works, all we need XD. The first rule of engineering: if it works, dont touch it.
   // Emitting the IR signal for 1ms
   pinMode(QTR_output, OUTPUT);
   digitalWrite(QTR_output,HIGH);
   delay(1);
-  // changing pinmode of sensor (it's really genius how this sensor works ha)
-  pinMode(QTR_output, INPUT);
-  // measuring time when signal emitted
-  QTR_time_1=micros();
+  pinMode(QTR_output, INPUT); // changing pinmode of sensor (it's really genius how this sensor works ha)
+  QTR_time_1=micros(); // measuring time when signal emitted
   // Recieving the IR signal
-  while (digitalRead(QTR_output)==HIGH){ //if there is no signal yet wait for 5 Microseconds and checking again if there is signal
+  while (digitalRead(QTR_output)==HIGH){ 
     delayMicroseconds(5);
   }
-  QTR_time_2=micros();  // loop ends when signal recieved, measuring time when signal recieved
-  color_val=QTR_time_2-QTR_time_1; // calculating the time spent on measurement, and getting the result of time it took to reflect from the material. IDK how it works, but it works XDXD
+  QTR_time_2=micros();  
+  color_val=QTR_time_2-QTR_time_1; 
   // Serial.println(color_val); // printing to serial monitor (optional)
   if (color_val>WHITE){ // return true, if material is dark
     return (true);
