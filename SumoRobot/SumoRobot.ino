@@ -10,12 +10,15 @@ Formula for movement:
 */
 
 
+// Libraries
+#include <math.h>
+
 
 // PinOut
 
 // QTR
 // VIN -> 5V
-int QTR_output = 5;
+int QTR_output; //QTR input output pin
 
 //Ultrasonic
 // Vcc->5V 
@@ -72,40 +75,42 @@ float getDist() {
 void goForward() {
   digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2R, LOW);
-  analogWrite(EnR, 255);     // move at full speed
   digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2L, LOW);
+  analogWrite(EnR, 255);     // move at full speed
   analogWrite(EnL, 255);  // move at full speed
 }
 
-void turnRight() {
+void turnRight(int percent=100) { //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
+  int power = ceil(2.55*percent);
   digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move counterclockwise
   digitalWrite(In2R, HIGH);
-  analogWrite(EnR, 255);     // move at full speed
   digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2L, LOW);
-  analogWrite(EnL, 255);  // move at full speed
+  analogWrite(EnR, power);     // move at full speed
+  analogWrite(EnL, power);  // move at full speed
 }
 
 // left
-void turnLeft() {
+void turnLeft(int percent=100) {  //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
+  int power = ceil(2.55*percent);
   digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2R, LOW);
-  analogWrite(EnR, 255);    // move at full speed
   digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move counterclockwise
   digitalWrite(In2L, HIGH);
-  analogWrite(EnL, 255);  // move at full speed
+  analogWrite(EnR, power);    // move at full speed
+  analogWrite(EnL, power);  // move at full speed
 }
 
 // backwards
 void goBackward() {
   digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move
   // counterclockwise
-    digitalWrite(In2R, HIGH);
-  analogWrite(EnR, 255);    // move at full speed
+  digitalWrite(In2R, HIGH);
   digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move
   // counterclockwise
     digitalWrite(In2L, HIGH);
+  analogWrite(EnR, 255);    // move at full speed
   analogWrite(EnL, 255);  // move at full speed
 }
 
@@ -113,9 +118,9 @@ void goBackward() {
 void rotate() {
   digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2R, LOW);
-  analogWrite(EnR, 255);     // move at full speed
   digitalWrite(In1L, HIGH);  // It is high and the other one is high so the motor will stop
   digitalWrite(In2L, HIGH);
+  analogWrite(EnR, 255);     // move at full speed
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
 }
 
@@ -123,9 +128,9 @@ void rotate() {
 void stop() {
   digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2R, HIGH);
-  analogWrite(EnR, 255);     // move at full speed
   digitalWrite(In1L, HIGH);  // It is high and the other one is high so the motor will stop
   digitalWrite(In2L, HIGH);
+  analogWrite(EnR, 255);     // move at full speed
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
 }
 bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "true", when sees black)
@@ -150,8 +155,34 @@ bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "tru
     return (false); // return false, if material is bright
   }
 }
+
+void search(){ //searching for opponent
+  while (getDist>70){
+    turnRight();
+    return("TORNADOOO");
+    delay(50);
+  }
+  stop();
+}
 // Main loop ////////////////////////////////////////////////////////////
 void loop() {   
-
+  if (floorBlack()==true){
+    if (getDist>70){
+      search();
+    }
+    else{
+      goForward();
+    }
+  }
+  else{ // we need some programm to escape 
+    if (getDist<20){
+      void; // We need some programm or attacking, or escaping the attack of the opponent, we need to outsmart them
+    }
+    else{ // moving a bit from the corner
+      goForward();
+      delay(300);
+      stop();
+    }
+  }
 }
 
