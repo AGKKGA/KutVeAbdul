@@ -129,7 +129,7 @@ void stop() {
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
 }
 bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "true", when sees black)
-  // I've tried to understand how this code works, but couldnt, but it works, all we need XD. The first rule of engineering: if it works, dont touch it.
+  // I've tried to understand how this code works, but couldnt, but it works, all we need XD. The first rule of engineering: if it works, dont touch it. (Only god and programmer of this code, knows how this code works)
   // Emitting the IR signal for 1ms
   pinMode(QTR_output, OUTPUT);
   digitalWrite(QTR_output,HIGH);
