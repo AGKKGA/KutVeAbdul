@@ -1,13 +1,13 @@
 int line=5;
-int vcc = 4;
+// int vcc = 4;
 unsigned long color_val, time_1, time_2;
 unsigned long WHITE=3000;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  pinMode(vcc, OUTPUT);
-  digitalWrite(vcc, HIGH);
+  // pinMode(vcc, OUTPUT);
+  // digitalWrite(vcc, HIGH);
   Serial.println("Hello, programm started working");
 
 }
@@ -26,8 +26,11 @@ void loop() {
   time_2=micros();
   color_val=time_2-time_1;
   Serial.println(color_val);
-  if (color_val<WHITE){
-    Serial.println("TURN BACK");
+  if (color_val>WHITE){
+    Serial.println("BLACK");
+  }
+  else{
+    Serial.println("WHITE");
   }
   delay(500);
 }

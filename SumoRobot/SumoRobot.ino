@@ -87,8 +87,8 @@ void turnRight(int percent=100) { //percent value from 0 to 100, for power of mo
   digitalWrite(In2R, HIGH);
   digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2L, LOW);
-  analogWrite(EnR, power);     // move at full speed
-  analogWrite(EnL, power);  // move at full speed
+  analogWrite(EnR, power);     
+  analogWrite(EnL, power);  
 }
 
 // left
@@ -98,8 +98,8 @@ void turnLeft(int percent=100) {  //percent value from 0 to 100, for power of mo
   digitalWrite(In2R, LOW);
   digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move counterclockwise
   digitalWrite(In2L, HIGH);
-  analogWrite(EnR, power);    // move at full speed
-  analogWrite(EnL, power);  // move at full speed
+  analogWrite(EnR, power);    
+  analogWrite(EnL, power);  
 }
 
 // backwards
@@ -138,7 +138,7 @@ bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "tru
   // Emitting the IR signal for 1ms
   pinMode(QTR_output, OUTPUT);
   digitalWrite(QTR_output,HIGH);
-  delay(1);
+  delay(5);
   pinMode(QTR_output, INPUT); // changing pinmode of sensor (it's really genius how this sensor works ha)
   QTR_time_1=micros(); // measuring time when signal emitted
   // Recieving the IR signal
@@ -147,7 +147,7 @@ bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "tru
   }
   QTR_time_2=micros();  
   color_val=QTR_time_2-QTR_time_1; 
-  // Serial.println(color_val); // printing to serial monitor (optional)
+  Serial.println(color_val); // printing to serial monitor (optional)
   if (color_val>WHITE){ // return true, if material is dark
     return (true);
   }
