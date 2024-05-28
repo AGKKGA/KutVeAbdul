@@ -20,24 +20,29 @@ Formula for movement:
 // VIN -> 5V
 int QTR_output; //QTR input output pin
 
+// button
+int button = 2;
+
 //Ultrasonic
 // Vcc->5V 
 int USS_trig; // Trigger pin
 int USS_echo; // Echo pin
 
 // Motor (Right)
-int In1R = 10;  // Input 1 for the right DC motor to control the direction of the motor
-int In2R = 11;  // Input 2 for the right DC motor to control the direction of the motor
+int In1R = 11;  // Input 1 for the right DC motor to control the direction of the motor
+int In2R = 10;  // Input 2 for the right DC motor to control the direction of the motor
 int EnR = 12;   // Enable pin for the right DC motor to control the speed of the motor
 
 // Motor (Left)
-int In1L = 7;  // Input 1 for the left DC motor to control the direction of the motor
-int In2L = 8;  // Input 2 for the left DC motor to control the direction of the motor
+int In1L = 8;  // Input 1 for the left DC motor to control the direction of the motor
+int In2L = 7;  // Input 2 for the left DC motor to control the direction of the motor
 int EnL = 9;   // Enable pin for the left DC motor to control the speed of the motor
 
 // VARIABLES
 unsigned long color_val, QTR_time_1, QTR_time_2; //needed for QTR sensor's function working
 unsigned long WHITE=3000; //brightness of white line. (needed to adjust bc values depends on environment)
+bool direction = true;
+bool opponent = false;
 
 // Setup
 void setup() {
@@ -57,8 +62,14 @@ void setup() {
   // Instead of stopping the whole thing, just stop the motor :)
   analogWrite(EnR, 0);  // Stop the right DC motor by making the speed 0
   analogWrite(EnL, 0);  // Stop the left DC motor by making the speed 0
+  digitalWrite(13, HIGH); //showing that, robot is ready by led on board
 
+  while (digitalRead(button)!=HIGH){ //waiting for the button to be pressed to start the robot.
+    delay(1);
+  }
+  digitalWrite(13, LOW);
   // QTR pinMode is adjusted in function
+  delay(5000);
 }
 // Function for measuring distance in cm by UltraSonic Sensor 
 float getDist() {
@@ -157,32 +168,77 @@ bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "tru
 }
 
 void search(){ //searching for opponent
-  while (getDist>70){
-    turnRight();
-    return("TORNADOOO");
+  bool found = false;
+  turnRight();
+  while (found==false){
+    if (getDist()<=70){
+      opponent=true;
+      found=true;
+    }
+    else{
+      found=false;
+    }
     delay(50);
   }
   stop();
 }
+
+void attack(){
+  bool opponent_now;
+  unsigned long t_1, t_2;
+  float time_for_turning;
+  unsigned long turning_time = 0;
+  bool found;
+  if (opponent==false){
+    search();
+  }
+  else{
+    if (direction==true){
+      turnRight();
+      t_1=millis();
+      while (turning_time<time_for_turning){
+        if (getDist()<70){
+          opponent_now = true;
+          direction = true;
+          stop();
+          break;
+        }
+        else{
+          t_2=millis();
+          turning_time = t_2-t_1;
+        }
+      }
+    else{
+      turnLeft();
+      t_1=millis();
+      while (turning_time<time_for_turning){
+        if (getDist()<70){
+          opponent_now = true;
+          direction = false;
+          stop();
+          break;
+        }
+        else{
+          t_2=millis();
+          turning_time = t_2-t_1;
+        }
+      }
+    }
+    goForward();
+    while (opponent_now == true){
+      if (getDist()<70){
+        opponent_now = true;
+      }
+      else{
+        opponent_now = false;
+        opponent = true;
+      }
+    }
+    stop();
+  }
+}
 // Main loop ////////////////////////////////////////////////////////////
 void loop() {   
-  if (floorBlack()==true){
-    if (getDist>70){
-      search();
-    }
-    else{
-      goForward();
-    }
-  }
-  else{ // we need some programm to escape 
-    if (getDist<20){
-      void; // We need some programm or attacking, or escaping the attack of the opponent, we need to outsmart them
-    }
-    else{ // moving a bit from the corner
-      goForward();
-      delay(300);
-      stop();
-    }
-  }
+  attack();
 }
 
