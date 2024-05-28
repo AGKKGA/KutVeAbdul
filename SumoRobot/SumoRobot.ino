@@ -25,8 +25,8 @@ int button = 2;
 
 //Ultrasonic
 // Vcc->5V 
-int USS_trig; // Trigger pin
-int USS_echo; // Echo pin
+int USS_trig = 5; // Trigger pin
+int USS_echo = 4; // Echo pin
 
 // Motor (Right)
 int In1R = 11;  // Input 1 for the right DC motor to control the direction of the motor
@@ -43,6 +43,7 @@ unsigned long color_val, QTR_time_1, QTR_time_2; //needed for QTR sensor's funct
 unsigned long WHITE=3000; //brightness of white line. (needed to adjust bc values depends on environment)
 bool direction = true;
 bool opponent = false;
+int distance_of_opponent = 30;
 
 // Setup
 void setup() {
@@ -69,7 +70,8 @@ void setup() {
   }
   digitalWrite(13, LOW);
   // QTR pinMode is adjusted in function
-  delay(5000);
+  delay(2000);
+  // angle_turnRight(90);
 }
 // Function for measuring distance in cm by UltraSonic Sensor 
 float getDist() {
@@ -120,7 +122,7 @@ void goBackward() {
   digitalWrite(In2R, HIGH);
   digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move
   // counterclockwise
-    digitalWrite(In2L, HIGH);
+  digitalWrite(In2L, HIGH);
   analogWrite(EnR, 255);    // move at full speed
   analogWrite(EnL, 255);  // move at full speed
 }
@@ -143,6 +145,13 @@ void stop() {
   digitalWrite(In2L, HIGH);
   analogWrite(EnR, 255);     // move at full speed
   analogWrite(EnL, 255);  // we can write 0 instead of 255 but since the both pins in this motor are high, the motor will stop
+}
+void turn_off(){
+  digitalWrite(In1R, LOW);  // It is high and the other one is low so the motor will move clockwise
+  digitalWrite(In2R, LOW);
+  digitalWrite(In1L, LOW);  // It is high and the other one is high so the motor will stop
+  digitalWrite(In2L, LOW);
+  delay(10);
 }
 bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "true", when sees black)
   // I've tried to understand how this code works, but couldnt, but it works, all we need XD. The first rule of engineering: if it works, dont touch it. (Only god and programmer of this code, knows how this code works)
@@ -169,9 +178,9 @@ bool floorBlack(){ //Function for QTR sensor, detecting black side. (Return "tru
 
 void search(){ //searching for opponent
   bool found = false;
-  turnRight();
+  turnRight(50);
   while (found==false){
-    if (getDist()<=70){
+    if (getDist()<=distance_of_opponent){
       opponent=true;
       found=true;
     }
@@ -186,21 +195,27 @@ void search(){ //searching for opponent
 void attack(){
   bool opponent_now;
   unsigned long t_1, t_2;
-  float time_for_turning;
+  float time_for_turning = 120;
   unsigned long turning_time = 0;
   bool found;
   if (opponent==false){
     search();
+    stop();
+    delay(100);
   }
   else{
     if (direction==true){
-      turnRight();
+      turnRight(50);
       t_1=millis();
       while (turning_time<time_for_turning){
-        if (getDist()<70){
+        if (getDist()<distance_of_opponent){
           opponent_now = true;
           direction = true;
-          stop();
+          turn_off();
+          // delay(100);
+          turnLeft();
+          delay(120);
+          turn_off();
           break;
         }
         else{
@@ -208,14 +223,20 @@ void attack(){
           turning_time = t_2-t_1;
         }
       }
+    }
     else{
-      turnLeft();
+      turnLeft(50);
       t_1=millis();
       while (turning_time<time_for_turning){
-        if (getDist()<70){
+        if (getDist()<distance_of_opponent){
           opponent_now = true;
           direction = false;
-          stop();
+          // stop();
+          turn_off();
+          // delay(100);
+          turnRight();
+          delay(120);
+          turn_off();
           break;
         }
         else{
@@ -226,7 +247,7 @@ void attack(){
     }
     goForward();
     while (opponent_now == true){
-      if (getDist()<70){
+      if (getDist()<distance_of_opponent){
         opponent_now = true;
       }
       else{
@@ -238,7 +259,33 @@ void attack(){
   }
 }
 // Main loop ////////////////////////////////////////////////////////////
-void loop() {   
-  attack();
+void loop() {
+  // while (true){
+  //   if(getDist()>70){
+  //     search();
+  //   }
+  //   else{
+  //     int dista=getDist();
+      // turn_off();
+      // // delay(100);
+      // turnLeft();
+      // delay(120);
+      // turn_off();
+  //     while(getDist()<70){
+  //       goForward();
+  //     }
+  //   }
+  // }
+  // turnRight(50);
+  // goForward();
+  turnRight();
+  delay(1000);
+  digitalWrite(13, HIGH);
+  turnLeft();
+  delay(30);
+  turn_off();
+  delay(2000);
+  digitalWrite(13, LOW);
 }
+
 
