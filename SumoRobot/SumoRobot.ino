@@ -43,7 +43,7 @@ unsigned long color_val, QTR_time_1, QTR_time_2; //needed for QTR sensor's funct
 unsigned long WHITE=3000; //brightness of white line. (needed to adjust bc values depends on environment)
 bool direction = true;
 bool opponent = false;
-int distance_of_opponent = 30;
+int distance_of_opponent = 50;
 
 // Setup
 void setup() {
@@ -225,7 +225,7 @@ void loop() {
             delay(120);
           }
           else{
-            delay(120);
+            delay(200);
           }
           // delay(100);
           turn_off(50);
