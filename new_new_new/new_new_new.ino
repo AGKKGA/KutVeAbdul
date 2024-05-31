@@ -57,20 +57,14 @@ void setup() {
 // Function for measuring distance in cm by UltraSonic Sensor 
 
 // Main loop ////////////////////////////////////////////////////////////
-void loop() {
-      if (getDist() > 2 && getDist() < distance_of_opponent) { 
-      goForward(); 
-      }
-    if (getDist() > distance_of_opponent) { 
-      search(); 
-      }
-    // goForward();
-}
+
+
+
 
 float getDist() {
   // Impulse 10 Microseconds
   digitalWrite(USS_trig, HIGH);
-  delayMicroseconds(10);
+  delayMicroseconds(5);
   digitalWrite(USS_trig, LOW);
   // Measuring time of signal treveling 
   uint32_t us = pulseIn(USS_echo, HIGH);
@@ -86,7 +80,6 @@ void goForward() {
   analogWrite(EnR, 255);     // move at full speed
   analogWrite(EnL, 255);  // move at full speed
 }
-
 void turnRight(int percent=100) { //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
   int power = ceil(2.55*percent);
   digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move counterclockwise
@@ -94,6 +87,17 @@ void turnRight(int percent=100) { //percent value from 0 to 100, for power of mo
   digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
   digitalWrite(In2L, LOW);
   analogWrite(EnR, power);     
+  analogWrite(EnL, power);  
+}
+
+
+void turnLeft(int percent=100) {  //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
+  int power = ceil(2.55*percent);
+  digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
+  digitalWrite(In2R, LOW);
+  digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move counterclockwise
+  digitalWrite(In2L, HIGH);
+  analogWrite(EnR, power);    
   analogWrite(EnL, power);  
 }
 
@@ -109,13 +113,105 @@ void turn_off(int time = 100){
 }
 
 void search(){ //searching for opponent
- do{
-  turnRight(70);
-  delay(50);
-  turn_off();
-  if (getDist() > 2 && getDist() <= distance_of_opponent){
-    goForward();
+  int counter = 0;
+  int angle = 6;
+  if(opponent==false || counter>1){
+    counter=0;
+    opponent = false;
+    Serial.println("Basic search...");
+    Serial.print("Counter: ");
+    Serial.println(counter);
+    do{
+      turnRight(70);
+      delay(50);
+      turn_off(70);
+      if (getDist() <= distance_of_opponent){
+        Serial.println("Found something in basic search...");
+        opponent=true;
+        Serial.println("Attacking...");
+        while (getDist()<distance_of_opponent){
+            goForward();
+        }
+      }
+    } while(opponent == false);
   }
-  delay(50);
- } while(getDist() > distance_of_opponent);
+  else{
+    Serial.println("Starting following function...");
+    if(direction==true){
+      Serial.println("Turning RIGHT and checking...");
+      counter+=1;
+      Serial.print("Counter: ");
+      Serial.println(counter);
+      for(int i=1;i<=angle;i++){
+        turnRight(70);
+        delay(50);
+        turn_off(70);
+        if (getDist() <= distance_of_opponent){
+          Serial.println("Found something.. attacking");
+          counter=0;
+          direction=true;
+          while (getDist()<distance_of_opponent){
+            goForward();
+          }
+          Serial.println("Stop attacking. Braking the loop");
+          break;
+        }
+        else{
+          direction=false;
+          Serial.println("Didnt find nothing, changing searching to the left");
+        }
+      }
+      if (direction=false){
+        Serial.println("Returning to the initial position...");
+        for(int i=1;i<=angle;i++){
+          turnLeft(70);
+          delay(50);
+          turn_off(70);
+        }
+      }
+    }
+    else{
+      Serial.println("Turning LEFT, and searching ...");
+      counter+=1;
+      Serial.print("Counter: ");
+      Serial.println(counter);
+      for(int i=1;i<=angle;i++){
+        turnLeft(70);
+        delay(50);
+        turn_off(70);
+        if (getDist() <= distance_of_opponent){
+          Serial.println("Found something attacking...");
+          counter=0;
+          direction=true;
+          while (getDist()<distance_of_opponent){
+            goForward();
+          }
+          Serial.println("Stopped attacking, breaking the loop");
+          break;
+        }
+        else{
+          direction=true;
+          Serial.println("Changing direction of spinning to the RIGHT");
+        }
+      }
+      if (direction=true){
+        Serial.println("Returnign to inital position...");
+        for(int i=1;i<=angle;i++){
+          turnRight(70);
+          delay(50);
+          turn_off(70);
+        }
+      }
+    }
+  }
 }
+void loop() {
+      if (getDist() < distance_of_opponent) { 
+      goForward(); 
+      }
+    if (getDist() > distance_of_opponent) { 
+      search(); 
+      }
+    // goForward();
+}
+
