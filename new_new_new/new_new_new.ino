@@ -112,8 +112,8 @@ void turn_off(int time = 100){
   delay(time);
 }
 
+int counter = 0;
 void search(){ //searching for opponent
-  int counter = 0;
   int angle = 6;
   if(opponent==false || counter>1){
     counter=0;
@@ -149,6 +149,7 @@ void search(){ //searching for opponent
         if (getDist() <= distance_of_opponent){
           Serial.println("Found something.. attacking");
           counter=0;
+          Serial.println("Putting counter to zero while attacking");
           direction=true;
           while (getDist()<distance_of_opponent){
             goForward();
@@ -165,7 +166,7 @@ void search(){ //searching for opponent
         Serial.println("Returning to the initial position...");
         for(int i=1;i<=angle;i++){
           turnLeft(70);
-          delay(50);
+          delay(60);
           turn_off(70);
         }
       }
@@ -182,7 +183,8 @@ void search(){ //searching for opponent
         if (getDist() <= distance_of_opponent){
           Serial.println("Found something attacking...");
           counter=0;
-          direction=true;
+          Serial.println("Putting counter to zero while attacking");
+          direction=false;
           while (getDist()<distance_of_opponent){
             goForward();
           }
@@ -198,7 +200,7 @@ void search(){ //searching for opponent
         Serial.println("Returnign to inital position...");
         for(int i=1;i<=angle;i++){
           turnRight(70);
-          delay(50);
+          delay(60);
           turn_off(70);
         }
       }
@@ -206,11 +208,16 @@ void search(){ //searching for opponent
   }
 }
 void loop() {
-      if (getDist() < distance_of_opponent) { 
+
+    if (getDist() < distance_of_opponent) {
+      Serial.println("Found something from the main loop inital attacking");
       goForward(); 
       }
-    if (getDist() > distance_of_opponent) { 
-      search(); 
+    else { 
+      Serial.println("Didnt find nothing while the main loop in inital, starting search() function");
+      while(true){
+        search(); 
+      }
       }
     // goForward();
 }
