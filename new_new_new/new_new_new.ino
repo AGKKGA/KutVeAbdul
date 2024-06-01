@@ -21,12 +21,72 @@ int In2L = 7;  // Input 2 for the left DC motor to control the direction of the 
 int EnL = 9;   // Enable pin for the left DC motor to control the speed of the motor
 
 // VARIABLES
-unsigned long color_val, QTR_time_1, QTR_time_2; //needed for QTR sensor's function working
-unsigned long WHITE=3000; //brightness of white line. (needed to adjust bc values depends on environment)
-bool direction = true;
-bool opponent = false;
-int distance_of_opponent = 30;
+bool direction = true; //true-right; false-left;
+bool opponent = false; //if opponent found true, if not false;
+int distance_of_opponent = 70; //distance till the opponent used to be 60-70, but for testing 30.
+int counter = 0; //counter for search function.
 
+float getDist() { // Function for measuring distance in cm by UltraSonic Sensor 
+  // Impulse 10 Microseconds
+  digitalWrite(USS_trig, HIGH);
+  delayMicroseconds(5);
+  digitalWrite(USS_trig, LOW);
+  // Measuring time of signal treveling 
+  uint32_t us = pulseIn(USS_echo, HIGH);
+  // Calculating distance (in cm) and returning
+  return (us * 0.034 / 2); 
+}
+
+void goForward() { //foward function:
+  digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
+  digitalWrite(In2R, LOW);
+  digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
+  digitalWrite(In2L, LOW);
+  analogWrite(EnR, 255);     // move at full speed
+  analogWrite(EnL, 255);  // move at full speed
+}
+
+void turnRight(int percent=100) { //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
+  int power = ceil(2.55*percent);
+  digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move counterclockwise
+  digitalWrite(In2R, HIGH);
+  digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
+  digitalWrite(In2L, LOW);
+  analogWrite(EnR, power);  //put the power of the right motor   
+  analogWrite(EnL, power);  //put the power of the left motor  
+}
+
+void turnLeft(int percent=100) {  //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
+  int power = ceil(2.55*percent);
+  digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
+  digitalWrite(In2R, LOW);
+  digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move counterclockwise
+  digitalWrite(In2L, HIGH);
+  analogWrite(EnR, power);    //put the power of the right motor   
+  analogWrite(EnL, power);    //put the power of the left motor 
+}
+
+void turn_off(int time = 100){ //stopping function. Basicly stopping by gear box of the motor.
+  digitalWrite(In1R, LOW);  //removing current from the coils
+  digitalWrite(In2R, LOW);
+  digitalWrite(In1L, LOW);  
+  digitalWrite(In2L, LOW);
+  analogWrite(EnR, 0);  //turning off the power from the right motor
+  analogWrite(EnL, 0);  //turning off the power from the left motor
+  delay(time); //delay for stopping the motors
+}
+//go backward function with precentage.
+void goBackward(int percent = 100) {
+  int power = ceil(2.55*percent);
+  digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move
+  // counterclockwise
+  digitalWrite(In2R, HIGH);
+  digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move
+  // counterclockwise
+  digitalWrite(In2L, HIGH);
+  analogWrite(EnR, power);    // move at full speed
+  analogWrite(EnL, power);  // move at full speed
+}
 // Setup
 void setup() {
   Serial.begin(9600);
@@ -46,75 +106,32 @@ void setup() {
   analogWrite(EnR, 0);  // Stop the right DC motor by making the speed 0
   analogWrite(EnL, 0);  // Stop the left DC motor by making the speed 0
   digitalWrite(13, HIGH); //showing that, robot is ready by led on board
-
-  while (digitalRead(button)!=HIGH){ //waiting for the button to be pressed to start the robot.
-    delay(1);
+  Serial.print("inital distance: ");
+  Serial.println(getDist());
+  if (getDist()>5){
+    while (digitalRead(button)!=HIGH){ //waiting for the button to be pressed to start the robot.
+      delay(1);
+    }
+    digitalWrite(13, LOW);
+    delay(2000); // Delay for start 2-5 seconds.
+    //spinning 180 degrees
+    turnRight(); //spinning 180 degrees as fast as we can
+    delay(150); //have to change this time to turn 180 degrees.
+    turn_off(); //stopping.
   }
-  digitalWrite(13, LOW);
-  delay(2000);
-
+  else{
+    goBackward();
+    delay(150);
+    turn_off();
+  }
 }
-// Function for measuring distance in cm by UltraSonic Sensor 
 
 // Main loop ////////////////////////////////////////////////////////////
-
-
-
-
-float getDist() {
-  // Impulse 10 Microseconds
-  digitalWrite(USS_trig, HIGH);
-  delayMicroseconds(5);
-  digitalWrite(USS_trig, LOW);
-  // Measuring time of signal treveling 
-  uint32_t us = pulseIn(USS_echo, HIGH);
-  // Calculating distance (in cm) and returning
-  return (us * 0.034 / 2); 
-}
-//foward function:
-void goForward() {
-  digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
-  digitalWrite(In2R, LOW);
-  digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
-  digitalWrite(In2L, LOW);
-  analogWrite(EnR, 255);     // move at full speed
-  analogWrite(EnL, 255);  // move at full speed
-}
-void turnRight(int percent=100) { //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
-  int power = ceil(2.55*percent);
-  digitalWrite(In1R, LOW);  // It is low and the other one is high so the motor will move counterclockwise
-  digitalWrite(In2R, HIGH);
-  digitalWrite(In1L, HIGH);  // It is high and the other one is low so the motor will move clockwise
-  digitalWrite(In2L, LOW);
-  analogWrite(EnR, power);     
-  analogWrite(EnL, power);  
-}
-
-
-void turnLeft(int percent=100) {  //percent value from 0 to 100, for power of motors (needed, because robot may turn too fast that ultrasnic sensors will not be able to measure) (initaly at 100)
-  int power = ceil(2.55*percent);
-  digitalWrite(In1R, HIGH);  // It is high and the other one is low so the motor will move clockwise
-  digitalWrite(In2R, LOW);
-  digitalWrite(In1L, LOW);  // It is low and the other one is high so the motor will move counterclockwise
-  digitalWrite(In2L, HIGH);
-  analogWrite(EnR, power);    
-  analogWrite(EnL, power);  
-}
-
-// stop
-void turn_off(int time = 100){
-  digitalWrite(In1R, LOW);  // It is high and the other one is low so the motor will move clockwise
-  digitalWrite(In2R, LOW);
-  digitalWrite(In1L, LOW);  // It is high and the other one is high so the motor will stop
-  digitalWrite(In2L, LOW);
-  analogWrite(EnR, 0);
-  analogWrite(EnL, 0);
-  delay(time);
-}
-
-int counter = 0;
-void search(){ //searching for opponent
+void search(){ //searching and attacking opponent (advanced level)
   int angle = 6;
+  int speed_perc = 50;
+  int turning_delay=40;
+  int stopping_delay=80;
   if(opponent==false || counter>1){
     counter=0;
     opponent = false;
@@ -122,9 +139,9 @@ void search(){ //searching for opponent
     Serial.print("Counter: ");
     Serial.println(counter);
     do{
-      turnRight(70);
-      delay(50);
-      turn_off(70);
+      turnRight(speed_perc);
+      delay(turning_delay);
+      turn_off(stopping_delay);
       if (getDist() <= distance_of_opponent){
         Serial.println("Found something in basic search...");
         opponent=true;
@@ -143,9 +160,9 @@ void search(){ //searching for opponent
       Serial.print("Counter: ");
       Serial.println(counter);
       for(int i=1;i<=angle;i++){
-        turnRight(70);
-        delay(50);
-        turn_off(70);
+        turnRight(speed_perc);
+        delay(turning_delay);
+        turn_off(stopping_delay);
         if (getDist() <= distance_of_opponent){
           Serial.println("Found something.. attacking");
           counter=0;
@@ -165,9 +182,9 @@ void search(){ //searching for opponent
       if (direction=false){
         Serial.println("Returning to the initial position...");
         for(int i=1;i<=angle;i++){
-          turnLeft(70);
-          delay(60);
-          turn_off(70);
+          turnLeft(speed_perc);
+          delay(turning_delay);
+          turn_off(stopping_delay);
         }
       }
     }
@@ -177,9 +194,9 @@ void search(){ //searching for opponent
       Serial.print("Counter: ");
       Serial.println(counter);
       for(int i=1;i<=angle;i++){
-        turnLeft(70);
-        delay(50);
-        turn_off(70);
+        turnLeft(speed_perc);
+        delay(turning_delay);
+        turn_off(stopping_delay);
         if (getDist() <= distance_of_opponent){
           Serial.println("Found something attacking...");
           counter=0;
@@ -199,26 +216,24 @@ void search(){ //searching for opponent
       if (direction=true){
         Serial.println("Returnign to inital position...");
         for(int i=1;i<=angle;i++){
-          turnRight(70);
-          delay(60);
-          turn_off(70);
+          turnRight(speed_perc);
+          delay(turning_delay);
+          turn_off(stopping_delay);
         }
       }
     }
   }
 }
 void loop() {
-
-    if (getDist() < distance_of_opponent) {
-      Serial.println("Found something from the main loop inital attacking");
-      goForward(); 
-      }
-    else { 
-      Serial.println("Didnt find nothing while the main loop in inital, starting search() function");
-      while(true){
-        search(); 
-      }
-      }
-    // goForward();
+  if (getDist() < distance_of_opponent) {
+    Serial.println("Found something from the main loop inital attacking");
+    goForward(); 
+  }
+  else { 
+    Serial.println("Didnt find nothing while the main loop in inital, starting search() function");
+    while(1){
+      search(); 
+    }
+  }
 }
 
